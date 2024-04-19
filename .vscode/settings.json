@@ -1,0 +1,15 @@
+{
+    "java.configuration.updateBuildConfiguration": "automatic",
+    "java.compile.nullAnalysis.mode": "automatic",
+    "java.test.config": {
+        "vmArgs": [
+            "-Xmx512M",
+            "-XX:+UseSerialGC"
+        ]
+    },
+    "java.project.explorer.showNonJavaResources": false,
+    "java.format.comments.enabled": false,
+    "java.format.settings.profile": "GoogleStyle",
+    "editor.inlayHints.enabled": "off",
+    "editor.formatOnSave": true
+}

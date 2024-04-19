@@ -1,0 +1,20 @@
+<head>
+    <script src="https://cdn.jsdelivr.net/npm/vue@3/dist/vue.global.min.js"></script>
+    <script>const app = Vue.createApp({});</script>
+    <style>
+        @inlineFile("/vue/styles.css")
+    </style> <!-- always included -->
+    <script>@inlineFileDev("/vue/scripts-dev.js")</script> <!-- only included in dev -->
+    <script>@inlineFileNotDev("/vue/scripts-not-dev.js")</script> <!-- only included in not dev -->
+    @componentRegistration <!-- JavalinVue will find required vue files and inline them here -->
+</head>
+
+<body>
+    <main id="main-vue" v-cloak>
+        @routeComponent
+        <!-- Your route component will be inlined here (app.get("/my-page", VueComponent("my-page"))) -->
+    </main>
+    <script>
+        app.mount("#main-vue");
+    </script>
+</body>

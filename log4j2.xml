@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Configuration status="warn">
+    <Properties>
+        <Property name="LOG_PATTERN">
+            %d{yyyy-MM-dd HH:mm:ss.SSS} %5p ${hostName} [%15.15t] %-40.40c{1.} : %m%n%ex
+        </Property>
+        <Property name="LOG_PATTERN4">
+            %black{%d{yyyy-MM-dd HH:mm:ss.SSS}} %highlight{%-5level} [%blue{%15.15t}] %yellow{%-40.40c{1.}}: %msg%n%throwable
+        </Property>
+    </Properties>
+    <Appenders>
+        <Console name="ConsoleAppender" target="SYSTEM_OUT" follow="true">
+            <PatternLayout pattern="${LOG_PATTERN4}"/>
+        </Console>
+    </Appenders>
+    <Loggers>        
+        <Root level="info" includeLocation="true">
+            <AppenderRef ref="ConsoleAppender" />
+        </Root> 
+    </Loggers>
+</Configuration>
