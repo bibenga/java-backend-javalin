@@ -37,12 +37,19 @@ public class WebApiApplication {
             config.staticFiles.enableWebjars();
 
             config.registerPlugin(new OpenApiPlugin(pluginConfig -> {
+                pluginConfig.documentationPath = "/api/openapi";
                 pluginConfig.withDefinitionConfiguration((version, definition) -> {
                     definition.withInfo(info -> info.setTitle("Javalin OpenAPI example"));
                 });
             }));
-            config.registerPlugin(new SwaggerPlugin());
-            config.registerPlugin(new ReDocPlugin());
+            config.registerPlugin(new SwaggerPlugin(pluginConfig -> {
+                pluginConfig.setUiPath("/api/swagger");
+                pluginConfig.setDocumentationPath("/api/openapi");
+            }));
+            config.registerPlugin(new ReDocPlugin(pluginConfig -> {
+                pluginConfig.setUiPath("/api/redoc");
+                pluginConfig.setDocumentationPath("/api/openapi");
+            }));
 
             config.vue.vueInstanceNameInJs = "app";
             // config.vue.rootDirectory("classpath:vue");
