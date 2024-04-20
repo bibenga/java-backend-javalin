@@ -2,8 +2,9 @@ package com.github.bibenga.palabras.api;
 
 import static io.javalin.apibuilder.ApiBuilder.get;
 import static io.javalin.apibuilder.ApiBuilder.path;
+import static io.javalin.apibuilder.ApiBuilder.post;
 
-import org.jetbrains.annotations.NotNull;
+import com.github.bibenga.palabras.entities.HibernateUtil;
 
 import io.javalin.Javalin;
 import io.javalin.http.Context;
@@ -22,6 +23,9 @@ public class WebApiApplication {
     //     // System.out.println(log4j2File.toURI().toString());
     //     System.setProperty("log4j2.configurationFile", log4j2File.toURI().toString());
     // }
+    static { //runs when the main class is loaded.
+        System.setProperty("org.jboss.logging.provider", "slf4j");
+    }
 
     public static void main(String[] args) {
         // System.out.println("olala");
@@ -32,6 +36,26 @@ public class WebApiApplication {
         // } catch (Exception ex) {
         //     ex.printStackTrace();
         // }
+
+        var session = HibernateUtil.getSessionFactory().getCurrentSession();
+        session.close();
+        // session.beginTransaction();
+
+        // var q = session.createQuery("select count(*) from User", Long.class);
+        // var cnt = q.list().get(0);
+        // log.info("users: count={}", cnt);
+
+        // var cb = session.getCriteriaBuilder();
+        // var cr = cb.createQuery(Long.class);
+        // var root = cr.from(User.class);
+        // cr.select(cb.count(root));
+        // var q2 = session.createQuery(cr);
+        // var cnt2 = q2.list().get(0);
+        // log.info("users: cnt2={}", cnt2);
+
+        // // session.persist(User.builder().setUsername("u1").setPassword("p1").build());
+        // session.getTransaction().commit();
+
         var app = Javalin.create(config -> {
             config.useVirtualThreads = true;
             config.http.asyncTimeout = 10_000L;
@@ -61,14 +85,16 @@ public class WebApiApplication {
                 // api routes
                 // get("/", ctx -> ctx.redirect("/users"));
                 path("/api/users", () -> {
+                    path("/count", () -> {
+                        get(UserController::getCount);
+                    });
                     get(UserController::getAll);
-                    // get();
-                    // post(UserController::create);
-                    // path("/{userId}", () -> {
-                    //     get(UserController::getOne);
-                    //     patch(UserController::update);
-                    //     delete(UserController::delete);
-                    // });
+                    post(UserController::create);
+                    path("/{uid}", () -> {
+                        get(UserController::get);
+                        // patch(UserController::update);
+                        // delete(UserController::delete);
+                    });
                     // ws("/events", userController::webSocketEvents);
                 });
             });
@@ -79,8 +105,8 @@ public class WebApiApplication {
         app.start(8000);
     }
 
-    private static void handleAccess(@NotNull Context context) {
-        log.info("handleAccess: {}", context.req().getPathInfo());
+    private static void handleAccess(Context ctx) {
+        log.info("handleAccess: {}", ctx.req().getPathInfo());
     }
 
 }

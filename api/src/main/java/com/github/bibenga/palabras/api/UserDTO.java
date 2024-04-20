@@ -4,13 +4,14 @@ import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
-import lombok.AccessLevel;
+import lombok.extern.jackson.Jacksonized;
 
 @Data
-@NoArgsConstructor(access = AccessLevel.PACKAGE)
-@AllArgsConstructor(access = AccessLevel.PACKAGE)
+@NoArgsConstructor
+@AllArgsConstructor
 @Builder
-public class User {
+@Jacksonized
+public class UserDTO {
     private String uid;
-    private String name;
+    private String username;
 }

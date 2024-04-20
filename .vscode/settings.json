@@ -10,6 +10,7 @@
     "java.project.explorer.showNonJavaResources": false,
     "java.format.comments.enabled": false,
     "java.format.settings.profile": "GoogleStyle",
+    "java.format.settings.url": ".vscode/eclipse-java-google-style.xml",
     "editor.inlayHints.enabled": "off",
     "editor.formatOnSave": true
 }
