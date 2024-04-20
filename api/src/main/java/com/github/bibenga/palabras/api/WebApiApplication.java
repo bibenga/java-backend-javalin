@@ -30,7 +30,9 @@ public class WebApiApplication {
 
         var app = Javalin.create(config -> {
             config.useVirtualThreads = true;
+            config.http.generateEtags = true;
             config.http.asyncTimeout = 10_000L;
+            config.http.brotliAndGzipCompression();
             // config.staticFiles.add("/public");
             config.staticFiles.enableWebjars();
 
