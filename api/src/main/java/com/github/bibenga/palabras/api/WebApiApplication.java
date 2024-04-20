@@ -48,11 +48,11 @@ public class WebApiApplication {
                 router.beforeMatched(WebApiApplication::handleAccess);
             }).apiBuilder(() -> {
                 // frontend routes
+                get("/", ctx -> ctx.redirect("/olala"));
                 get("/olala", new VueComponent("olala"));
                 get("/purum", new VueComponent("purum"));
             }).apiBuilder(() -> {
                 // api routes
-                // get("/", ctx -> ctx.redirect("/users"));
                 path("/api/users", () -> {
                     path("/count", () -> {
                         get(UserController::getCount);

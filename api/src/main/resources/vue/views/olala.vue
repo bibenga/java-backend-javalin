@@ -9,7 +9,7 @@
     <div v-if="users">
       <ul class="user-overview-list">
         <li v-for="user in users">
-          <a :href="`/users/${user.id}`">{{user.name}}</a>
+          <a :href="`/users/${user.uid}`">{{user.username}}</a>
         </li>
       </ul>
     </div>
