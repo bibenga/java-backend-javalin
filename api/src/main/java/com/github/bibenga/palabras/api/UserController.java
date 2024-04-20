@@ -43,14 +43,20 @@ public class UserController {
     }
 
     @OpenApi(summary = "Get all users", operationId = "getAllUsers", path = "/api/users",
-            methods = HttpMethod.GET, tags = {"User"}, responses = {@OpenApiResponse(status = "200",
+            methods = HttpMethod.GET, tags = {"User"},
+            queryParams = {@OpenApiParam(name = "username", type = String.class,
+                    description = "The username")},
+            responses = {@OpenApiResponse(status = "200",
                     content = {@OpenApiContent(from = UserDTO[].class)}),
             // @OpenApiResponse(status = "400", content = {@OpenApiContent(from = ErrorResponse.class)}),
             // @OpenApiResponse(status = "404", content = {@OpenApiContent(from = ErrorResponse.class)})
             })
     public static void getAll(Context ctx) {
-        log.info("getAll");
         // NaiveRateLimit.requestPerTimeUnit(ctx, 5, TimeUnit.SECONDS); // throws if rate limit is exceeded
+
+        // var usernameParam = ctx.queryParamAsClass("username", String.class);
+        var username = ctx.queryParamAsClass("username", String.class).allowNullable().get();
+        log.info("getAll: username={}", username);
 
         var session = HibernateUtil.getSessionFactory().getCurrentSession();
         try {
@@ -64,6 +70,9 @@ public class UserController {
             var cr = cb.createQuery(User.class);
             var root = cr.from(User.class);
             cr.select(root);
+            if (username != null) {
+                cr.where(cb.ilike(root.get(User_.username), username));
+            }
             var q = session.createQuery(cr);
             // UserDTO.builder().setUid(u.getExternalId()).setUsername(u.getUsername()).build();
             var users = q.list().stream().map(u -> new UserDTO(u.getExternalId(), u.getUsername()))
