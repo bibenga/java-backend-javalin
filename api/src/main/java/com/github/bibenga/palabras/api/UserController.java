@@ -24,18 +24,22 @@ public class UserController {
                     content = {@OpenApiContent(from = Long.class)}),})
     public static void getCount(Context context) {
         var session = HibernateUtil.getSessionFactory().getCurrentSession();
-        session.beginTransaction();
+        try {
+            session.beginTransaction();
 
-        var cb = session.getCriteriaBuilder();
-        var cr = cb.createQuery(Long.class);
-        var root = cr.from(User.class);
-        cr.select(cb.count(root));
-        var q = session.createQuery(cr);
-        // var cnt = q.list().get(0);
-        var cnt = q.uniqueResult();
+            var cb = session.getCriteriaBuilder();
+            var cr = cb.createQuery(Long.class);
+            var root = cr.from(User.class);
+            cr.select(cb.count(root));
+            var q = session.createQuery(cr);
+            // var cnt = q.list().get(0);
+            var cnt = q.uniqueResult();
 
-        context.json(cnt);
-        session.getTransaction().rollback();
+            context.json(cnt);
+            session.getTransaction().rollback();
+        } finally {
+            session.close();
+        }
     }
 
     @OpenApi(summary = "Get all users", operationId = "getAllUsers", path = "/api/users",
@@ -49,21 +53,28 @@ public class UserController {
         // NaiveRateLimit.requestPerTimeUnit(ctx, 5, TimeUnit.SECONDS); // throws if rate limit is exceeded
 
         var session = HibernateUtil.getSessionFactory().getCurrentSession();
-        session.beginTransaction();
+        try {
+            session.beginTransaction();
 
-        var cb = session.getCriteriaBuilder();
-        var cr = cb.createQuery(User.class);
-        var root = cr.from(User.class);
-        cr.select(root);
-        var q = session.createQuery(cr);
-        // UserDTO.builder().setUid(u.getExternalId()).setUsername(u.getUsername()).build();
-        // q.list().stream().map(u -> new UserDTO()).collect(Collectors.toList());
-        var users = q.list().stream().map(u -> new UserDTO(u.getExternalId(), u.getUsername()))
-                .collect(Collectors.toList());
+            // var q = session.createQuery("select count(*) from User", Long.class);
+            // var cnt = q.list().get(0);
+            // log.info("users: count={}", cnt);
 
-        ctx.json(users);
+            var cb = session.getCriteriaBuilder();
+            var cr = cb.createQuery(User.class);
+            var root = cr.from(User.class);
+            cr.select(root);
+            var q = session.createQuery(cr);
+            // UserDTO.builder().setUid(u.getExternalId()).setUsername(u.getUsername()).build();
+            var users = q.list().stream().map(u -> new UserDTO(u.getExternalId(), u.getUsername()))
+                    .collect(Collectors.toList());
 
-        session.getTransaction().rollback();
+            ctx.json(users);
+
+            session.getTransaction().rollback();
+        } finally {
+            session.close();
+        }
     }
 
     @OpenApi(summary = "Create new user", operationId = "createUser", path = "/api/users",
@@ -71,16 +82,23 @@ public class UserController {
             requestBody = @OpenApiRequestBody(content = {@OpenApiContent(from = UserDTO.class)}),
             responses = {@OpenApiResponse(status = "200"),})
     public static void create(Context ctx) {
-        UserDTO user = ctx.bodyAsClass(UserDTO.class);
-        log.info("create: {}", user);
+        UserDTO userDto = ctx.bodyAsClass(UserDTO.class);
+        log.info("create: {}", userDto);
 
         var session = HibernateUtil.getSessionFactory().getCurrentSession();
-        session.beginTransaction();
-
-        session.persist(User.builder().setExternalId(user.getUid()).setUsername(user.getUsername())
-                .build());
-        session.getTransaction().commit();
-        ctx.json(user);
+        try {
+            session.beginTransaction();
+            var user = User.builder().setExternalId(userDto.getUid())
+                    .setUsername(userDto.getUsername()).build();
+            session.persist(user);
+            session.getTransaction().commit();
+            ctx.json(userDto);
+        } catch (Exception e) {
+            session.getTransaction().rollback();
+            throw e;
+        } finally {
+            session.close();
+        }
     }
 
     @OpenApi(summary = "Get user", operationId = "getUser", path = "/api/users/{uid}",

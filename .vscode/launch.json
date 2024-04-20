@@ -10,7 +10,7 @@
             "request": "launch",
             "mainClass": "com.github.bibenga.palabras.api.WebApiApplication",
             "projectName": "api",
-            "vmArgs": "-Xint -Xmx256M -XX:+UseSerialGC"
+            "vmArgs": "-Xmx256M -XX:+UseSerialGC"
         },
         {
             "type": "java",

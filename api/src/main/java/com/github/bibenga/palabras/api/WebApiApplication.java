@@ -3,9 +3,7 @@ package com.github.bibenga.palabras.api;
 import static io.javalin.apibuilder.ApiBuilder.get;
 import static io.javalin.apibuilder.ApiBuilder.path;
 import static io.javalin.apibuilder.ApiBuilder.post;
-
 import com.github.bibenga.palabras.entities.HibernateUtil;
-
 import io.javalin.Javalin;
 import io.javalin.http.Context;
 import io.javalin.openapi.plugin.OpenApiPlugin;
@@ -18,43 +16,14 @@ import lombok.extern.slf4j.Slf4j;
 public class WebApiApplication {
     // https://javalin.io/tutorials/openapi-example
 
-    // static {
-    //     var log4j2File = new File("log4j2.xml");
-    //     // System.out.println(log4j2File.toURI().toString());
-    //     System.setProperty("log4j2.configurationFile", log4j2File.toURI().toString());
-    // }
     static { //runs when the main class is loaded.
         System.setProperty("org.jboss.logging.provider", "slf4j");
     }
 
     public static void main(String[] args) {
-        // System.out.println("olala");
-        // try {
-        //     var inputStream = new FileInputStream("log4j2.xml");
-        //     var source = new ConfigurationSource(inputStream);
-        //     Configurator.initialize(null, source);
-        // } catch (Exception ex) {
-        //     ex.printStackTrace();
-        // }
-
-        var session = HibernateUtil.getSessionFactory().getCurrentSession();
-        session.close();
-        // session.beginTransaction();
-
-        // var q = session.createQuery("select count(*) from User", Long.class);
-        // var cnt = q.list().get(0);
-        // log.info("users: count={}", cnt);
-
-        // var cb = session.getCriteriaBuilder();
-        // var cr = cb.createQuery(Long.class);
-        // var root = cr.from(User.class);
-        // cr.select(cb.count(root));
-        // var q2 = session.createQuery(cr);
-        // var cnt2 = q2.list().get(0);
-        // log.info("users: cnt2={}", cnt2);
-
-        // // session.persist(User.builder().setUsername("u1").setPassword("p1").build());
-        // session.getTransaction().commit();
+        HibernateUtil.getSessionFactory();
+        // var session = HibernateUtil.getSessionFactory().getCurrentSession();
+        // session.close();
 
         var app = Javalin.create(config -> {
             config.useVirtualThreads = true;

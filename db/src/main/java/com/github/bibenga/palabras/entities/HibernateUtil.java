@@ -1,6 +1,7 @@
 package com.github.bibenga.palabras.entities;
 
 import org.hibernate.SessionFactory;
+import org.hibernate.Transaction;
 import org.hibernate.cfg.Configuration;
 
 public class HibernateUtil {
@@ -22,4 +23,24 @@ public class HibernateUtil {
         return sessionFactory;
     }
 
+    public static void runInTransaction(Runnable runnable) {
+        var session = getSessionFactory().getCurrentSession();
+        Transaction tx = null;
+        try {
+            tx = session.beginTransaction();
+            runnable.run();
+            tx.commit();
+        } catch (Exception e) {
+            if (tx != null && tx.isActive()) {
+                try {
+                    tx.rollback();
+                } catch (Exception e2) {
+                    throw e2;
+                }
+                throw e;
+            }
+        } finally {
+            session.close();
+        }
+    }
 }
