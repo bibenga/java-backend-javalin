@@ -36,6 +36,10 @@ public class WebApiApplication {
             // config.staticFiles.add("/public");
             config.staticFiles.enableWebjars();
 
+            config.bundledPlugins.enableDevLogging(pluginConfig -> {
+                pluginConfig.skipStaticFiles = true;
+            });
+
             config.registerPlugin(new OpenApiPlugin(pluginConfig -> {
                 pluginConfig.documentationPath = "/api/openapi";
                 pluginConfig.withDefinitionConfiguration((version, definition) -> {
