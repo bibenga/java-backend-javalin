@@ -6,9 +6,9 @@ import org.hibernate.cfg.Configuration;
 
 public class HibernateUtil {
 
-    private static final SessionFactory sessionFactory = buildSessionFactory();
+    // private static final SessionFactory sessionFactory = buildSessionFactory();
 
-    private static SessionFactory buildSessionFactory() {
+    public static SessionFactory buildSessionFactory() {
         try {
             // Create the SessionFactory from hibernate.cfg.xml
             return new Configuration().configure("file:./hibernate.cfg.xml").buildSessionFactory();
@@ -19,16 +19,20 @@ public class HibernateUtil {
         }
     }
 
-    public static SessionFactory getSessionFactory() {
-        return sessionFactory;
-    }
+    // public static SessionFactory getSessionFactory() {
+    //     return sessionFactory;
+    // }
 
-    public static void runInTransaction(Runnable runnable) {
-        var session = getSessionFactory().getCurrentSession();
+    // public static void runInTransaction(Runnable task) {
+    //     runInTransaction(getSessionFactory(), task);
+    // }
+
+    public static void runInTransaction(SessionFactory sessionFactory, Runnable task) {
+        var session = sessionFactory.getCurrentSession();
         Transaction tx = null;
         try {
             tx = session.beginTransaction();
-            runnable.run();
+            task.run();
             tx.commit();
         } catch (Exception e) {
             if (tx != null && tx.isActive()) {

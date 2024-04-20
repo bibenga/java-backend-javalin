@@ -1,11 +1,11 @@
 package com.github.bibenga.palabras.api;
 
 import java.util.stream.Collectors;
-
+import org.hibernate.SessionFactory;
 import com.github.bibenga.palabras.entities.HibernateUtil;
 import com.github.bibenga.palabras.entities.User;
 import com.github.bibenga.palabras.entities.User_;
-
+import io.javalin.config.Key;
 import io.javalin.http.Context;
 import io.javalin.http.NotFoundResponse;
 import io.javalin.openapi.HttpMethod;
@@ -18,12 +18,15 @@ import lombok.extern.slf4j.Slf4j;
 
 @Slf4j
 public class UserController {
+    private static Key<SessionFactory> sessionFactoryKey =
+            new Key<SessionFactory>("sessionFactory");
 
     @OpenApi(summary = "Get users count", operationId = "getUsersCount", path = "/api/users/count",
             methods = HttpMethod.GET, tags = {"User"}, responses = {@OpenApiResponse(status = "200",
                     content = {@OpenApiContent(from = Long.class)}),})
-    public static void getCount(Context context) {
-        var session = HibernateUtil.getSessionFactory().getCurrentSession();
+    public static void getCount(Context ctx) {
+        // var session = HibernateUtil.getSessionFactory().getCurrentSession();
+        var session = ctx.appData(sessionFactoryKey).getCurrentSession();
         try {
             session.beginTransaction();
 
@@ -35,7 +38,7 @@ public class UserController {
             // var cnt = q.list().get(0);
             var cnt = q.uniqueResult();
 
-            context.json(cnt);
+            ctx.json(cnt);
             session.getTransaction().rollback();
         } finally {
             session.close();
@@ -58,7 +61,8 @@ public class UserController {
         var username = ctx.queryParamAsClass("username", String.class).allowNullable().get();
         log.info("getAll: username={}", username);
 
-        var session = HibernateUtil.getSessionFactory().getCurrentSession();
+        // var session = HibernateUtil.getSessionFactory().getCurrentSession();
+        var session = ctx.appData(sessionFactoryKey).getCurrentSession();
         try {
             session.beginTransaction();
 
@@ -94,7 +98,8 @@ public class UserController {
         UserDTO userDto = ctx.bodyAsClass(UserDTO.class);
         log.info("create: {}", userDto);
 
-        var session = HibernateUtil.getSessionFactory().getCurrentSession();
+        // var session = HibernateUtil.getSessionFactory().getCurrentSession();
+        var session = ctx.appData(sessionFactoryKey).getCurrentSession();
         try {
             session.beginTransaction();
             var user = User.builder().setExternalId(userDto.getUid())
@@ -125,7 +130,8 @@ public class UserController {
         var uid = ctx.pathParamAsClass("uid", String.class).get();
         log.info("get: uid={}", uid);
 
-        var session = HibernateUtil.getSessionFactory().getCurrentSession();
+        // var session = HibernateUtil.getSessionFactory().getCurrentSession();
+        var session = ctx.appData(sessionFactoryKey).getCurrentSession();
         try {
             session.beginTransaction();
 

@@ -3,8 +3,10 @@ package com.github.bibenga.palabras.api;
 import static io.javalin.apibuilder.ApiBuilder.get;
 import static io.javalin.apibuilder.ApiBuilder.path;
 import static io.javalin.apibuilder.ApiBuilder.post;
+import org.hibernate.SessionFactory;
 import com.github.bibenga.palabras.entities.HibernateUtil;
 import io.javalin.Javalin;
+import io.javalin.config.Key;
 import io.javalin.http.Context;
 import io.javalin.openapi.plugin.OpenApiPlugin;
 import io.javalin.openapi.plugin.redoc.ReDocPlugin;
@@ -21,7 +23,8 @@ public class WebApiApplication {
     }
 
     public static void main(String[] args) {
-        HibernateUtil.getSessionFactory();
+        var sessionFactoryKey = new Key<SessionFactory>("sessionFactory");
+        var sessionFactory = HibernateUtil.buildSessionFactory();
         // var session = HibernateUtil.getSessionFactory().getCurrentSession();
         // session.close();
 
@@ -43,6 +46,8 @@ public class WebApiApplication {
             // config.vue.rootDirectory("classpath:vue");
             config.vue.isDevFunction = ctx -> false;
             // config.vue.rootDirectory(config.classpath("/vue"));
+
+            config.appData(sessionFactoryKey, sessionFactory);
 
             config.router.mount(router -> {
                 router.beforeMatched(WebApiApplication::handleAccess);
